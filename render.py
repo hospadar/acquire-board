@@ -17,10 +17,11 @@ def render_board(
     outer_border = .75,
     board_rows = 9,
     board_columns = 12,
-    stroke = .1,
+    stroke = .05,
     corner_radius_ratio = .15,
     text_scale=.4,
-    text_vpad=.1 #height of text relative to cell
+    text_pad=.2, #height of text relative to cell
+    font="04b"
 ):
     board_height = board_rows * cell_size \
                     + (board_rows - 1) * cell_border \
@@ -35,7 +36,7 @@ def render_board(
 
     style="fill: none; stroke: black; stroke-width: {stroke}".format(**locals())
 
-    def piece_outlines():
+    def piece_outlines(shape_style=style):
         pieces = elem("g")
         for row in range(board_rows):
             for col in range(board_columns):
@@ -45,7 +46,7 @@ def render_board(
                     height=cell_size,
                     width=cell_size,
                     rx=corner_radius,
-                    style=style
+                    style=shape_style
                 ))
         return pieces
 
@@ -54,18 +55,30 @@ def render_board(
         text_height = text_scale*cell_size
         for row in range(board_rows):
             for col in range(board_columns):
-                label = elem(
+                letter_label = elem(
                     "text",
-                    x=col*cell_size+col*cell_border+.5*cell_size,
-                    y=row*cell_size+row*cell_border+.5*cell_size-text_vpad,
+                    x=col*cell_size+col*cell_border+text_pad,
+                    y=row*cell_size+row*cell_border+text_height+.5*text_pad,
                     font_size=text_height,
-                    font_family="sans-serif",
-                    text_anchor="middle",
+                    font_family="{font}".format(font=font),
+                    #text_anchor="left",
                     fill="red",
-                    dominant_baseline="middle"
+                    dominant_baseline="top"
                 )
-                label.text="{letter}-{number}".format(letter=chr(ord('A')+row), number=col)
-                labels.append(label)
+                letter_label.text = str(chr(ord('A')+row))
+                number_label = elem(
+                    "text",
+                    x=col*cell_size+col*cell_border+cell_size-text_pad,
+                    y=row*cell_size+row*cell_border+cell_size-text_pad,
+                    font_size=text_height,
+                    font_family="{font}".format(font=font),
+                    text_anchor="end",
+                    fill="red",
+                    #dominant_baseline="bottom"
+                )
+                number_label.text=str(col+1)
+                labels.append(letter_label)
+                labels.append(number_label)
         return labels
 
     def board_outline():
@@ -87,6 +100,8 @@ def render_board(
     lower_board.append(board_outline())
     lower_labels = elem("g", transform="translate({x} {y})".format(x=outer_border, y=outer_border))
     lower_labels.append(piece_labels())
+    #if you want engraved outlines of the piece shapes
+    #lower_labels.append(piece_outlines("fill: none; stroke: red; stroke-width: {stroke}".format(**locals())))
     lower_board.append(lower_labels)
 
     upper_board = elem("g")
@@ -98,7 +113,7 @@ def render_board(
     #upper_board_pieces.append(piece_labels())
     upper_board.append(upper_board_pieces)
 
-    pieces = elem("g")
+    pieces = elem("g", transform="translate({x} {y})".format(x=outer_border, y=outer_border))
     pieces.append(piece_outlines())
     pieces.append(piece_labels())
 
