@@ -21,7 +21,8 @@ def render_board(
     corner_radius_ratio = .15,
     text_scale=.4,
     text_pad=.2, #height of text relative to cell
-    font="04b"
+    font="04b",
+    separator_stroke = .1
 ):
     board_height = board_rows * cell_size \
                     + (board_rows - 1) * cell_border \
@@ -76,9 +77,27 @@ def render_board(
                     fill="red",
                     #dominant_baseline="bottom"
                 )
+
+                separator = elem(
+                    "line",
+                    style="stroke: red; stroke-width: {separator_stroke}".format(separator_stroke=separator_stroke),
+                    x1=col*cell_size+col*cell_border+.75*cell_size,
+                    y1=row*cell_size+row*cell_border+.45*cell_size,
+                    x2=col*cell_size+col*cell_border+.25*cell_size,
+                    y2=row*cell_size+row*cell_border+.54*cell_size
+                )
+                dot = elem(
+                    "circle",
+                    cx=col*cell_size+col*cell_border+.5*cell_size,
+                    cy=row*cell_size+row*cell_border+.5*cell_size,
+                    r=.05*cell_size,
+                    style="fill: red; stroke: none"
+                )
                 number_label.text=str(col+1)
                 labels.append(letter_label)
                 labels.append(number_label)
+                #labels.append(separator)
+                #labels.append(dot)
         return labels
 
     def board_outline():
